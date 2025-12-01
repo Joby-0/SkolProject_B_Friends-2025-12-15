@@ -1,4 +1,154 @@
 ﻿@page
-@model MyApp.Namespace.DetailsModel
+@model Pages.DetailsModel
 @{
 }
+<div class="card p-4 mb-4">
+    <h1 class="mb-3">Deatil view
+
+        <a asp-page="/Details" asp-route-id="@Model.friend.FriendId" asp-route-canedit="true" class="btn btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                class="bi bi-pencil-square" viewBox="0 0 16 16">
+                <path
+                    d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                <path fill-rule="evenodd"
+                    d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
+            </svg>
+        </a>
+
+
+    </h1>
+
+
+    <form method="post">
+        <input type="hidden" name="friend.FriendId" value="@Model.friend.FriendId" />
+        <div class="card p-4 mb-4">
+            <h3 class="mb-3">Personal Information</h3>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="FirstName" class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="FirstName" name="friend.FirstName"
+                        value="@Model.friend.FirstName" @(Model.canEdit ? "" : "disabled")>
+                </div>
+                <div class="col-md-6">
+                    <label for="LastName" class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="LastName" name="friend.LastName" value="@Model.friend.LastName"
+                        @(Model.canEdit ? "" : "disabled")>
+                </div>
+                <div class="col-md-6">
+                    <label for="Birthday" class="form-label">Birthday</label>
+                    <input type="date" class="form-control" id="Birthday" name="friend.Birthday"
+                        value="@(Model.friend.Birthday.HasValue? Model.friend.Birthday.Value.ToString("yyyy-MM-dd") : "")"
+                        @(Model.canEdit ? "" : "disabled")>
+                </div>
+                <div class=" col-md-6">
+                    <label for="Email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="Email" name="friend.Email" value="@Model.friend.Email"
+                        @(Model.canEdit ? "" : "disabled")>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4">
+            <h3 class="mb-3">Address</h3>
+            <input type="hidden" name="friend.Address.AddressId" value="@Model.friend.Address.AddressId" />
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="City" class="form-label">City</label>
+                    <input type="text" class="form-control" id="City" name="friend.Address.City" value="@Model.friend.Address.City"
+                        @(Model.canEdit ? "" : "disabled")>
+                </div>
+                <div class="col-md-4">
+                    <label for="Country" class="form-label">Country</label>
+                    <input type="text" class="form-control" id="Country" name="friend.Address.Country"
+                        value="@Model.friend.Address.Country" @(Model.canEdit ? "" : "disabled")>
+                </div>
+                <div class="col-md-4">
+                    <label for="ZipCode" class="form-label">Zip Code</label>
+                    <input type="text" class="form-control" id="ZipCode" name="friend.Address.ZipCode"
+                        value="@Model.friend.Address.ZipCode" @(Model.canEdit ? "" : "disabled")>
+                </div>
+            </div>
+        </div>
+
+        @if (Model.canEdit)
+        {
+            <div class="text-end">
+                <button type="submit" class="btn btn-success">Save</button>
+            </div>
+        }
+    </form>
+
+
+    <h1>Pets</h1>
+    <table class="table table-striped table-bordered ">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Mood</th>
+                <th>Kind</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                if (Model.friend.Pets != null)
+                {
+                    @foreach (var pet in Model.friend.Pets)
+                    {
+                        <tr>
+                            <td>@pet.Name</td>
+                            <td>@pet.Mood</td>
+                            <td>@pet.Kind</td>
+
+                            @if (Model.canEdit)
+                            {
+                                <td>
+
+                                    <button class="btn btn-danger">Delete</button>
+                                    <button class="btn btn-secondary">Edit</button>
+
+                                </td>
+                            }
+                        </tr>
+                    }
+                }
+            }
+
+        </tbody>
+    </table>
+
+    <h1>Quotes</h1>
+    <table class="table table-striped table-bordered ">
+        <thead>
+            <tr>
+                <th>Quote</th>
+                <th>Author</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                if (Model.friend.Quotes != null)
+                {
+                    @foreach (var q in Model.friend.Quotes)
+                    {
+                        <tr>
+                            <td>@q.QuoteText</td>
+                            <td>@q.Author</td>
+                            @if (Model.canEdit)
+                            {
+                                <td>
+
+                                    <button class="btn btn-danger">Delete</button>
+                                    <button class="btn btn-secondary">Edit</button>
+
+                                </td>
+                            }
+                        </tr>
+                    }
+                }
+            }
+
+        </tbody>
+    </table>
+
+</div>

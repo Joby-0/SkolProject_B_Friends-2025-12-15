@@ -46,7 +46,7 @@
                 @foreach (var q in Model.FriendsList.PageItems)
                 {
                     <tr>
-                        <td><a asp-page="/Studies/Model/ModelView" asp-route-id=@q.FriendId class="btn btn-link" type="button">@q.FirstName @q.LastName</a></td>
+                        <td><a asp-page="/Details" asp-route-id=@q.FriendId class="btn btn-link" type="button">@q.FirstName @q.LastName</a></td>
                         <td>@q.Email</td>
                         <td>@(q.Birthday.HasValue ? q.Birthday.Value.ToString("d MMMM yyyy") : "No birthday found")</td>
                         <td>
