@@ -25,10 +25,13 @@ public class ListPageModel : PageModel
     readonly IAddressesService _addressesService;
     readonly IFriendsService _friendsService;
 
-    public ListPageModel(IAddressesService addressesService, IFriendsService friendsService)
+    readonly IAdminService _adminService;
+
+    public ListPageModel(IAddressesService addressesService, IFriendsService friendsService, IAdminService adminService)
     {
         _addressesService = addressesService;
         _friendsService = friendsService;
+        _adminService = adminService;
     }
 
     public async Task<IActionResult> OnPost()
@@ -36,12 +39,10 @@ public class ListPageModel : PageModel
         await populatedAddressListAsync();
         if (!string.IsNullOrWhiteSpace(SelectedCountry))
         {
-            // Filter cities based on the selected country
-            CityList = AddressesList
-                .Where(a => a.Country == SelectedCountry)
-                .Select(a => a.City)
-                .Distinct()
-                .ToList();
+            var dbInfo = await _adminService.GuestInfoAsync();
+
+            
+            CityList = dbInfo.Item.Friends.Where(f => f.Country == SelectedCountry && !string.IsNullOrEmpty(f.City)).ToList().Select(c => c.City).ToList();
 
             // Reset city if country changed
             if (SelectedCity != null && !CityList.Contains(SelectedCity))
@@ -68,7 +69,7 @@ public class ListPageModel : PageModel
 
     public void ToDetailsPage(Guid id)
     {
-      Console.WriteLine(id);
+        Console.WriteLine(id);
     }
 
     public async Task<IActionResult> OnGet()
