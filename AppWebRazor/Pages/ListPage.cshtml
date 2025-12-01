@@ -2,3 +2,61 @@
 @model Pages.ListPageModel
 @{
 }
+
+<form method="post" class="d-flex">
+    <select name="SelectedCountry" class="form-select" aria-label="Default select example"
+        onchange="this.form.submit()">
+        <option selected></option>
+
+        @foreach (var c in Model.AddressesList.Select(a => a.Country).Distinct())
+        {
+            <option value="@c" selected="@(Model.SelectedCountry == c)">
+                @c
+            </option>
+        }
+
+    </select>
+
+    <select name="SelectedCity" class="form-select" onchange="this.form.submit()">
+        <option selected></option>
+        @foreach (var c in Model.CityList)
+        {
+            <option value="@c" selected="@(Model.SelectedCity == c)">
+                @c
+            </option>
+        }
+
+    </select>
+</form>
+
+
+
+<table class="table table-striped table-bordered ">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Birthday</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            if (Model.FriendsList.PageItems != null)
+            {
+                @foreach (var q in Model.FriendsList.PageItems)
+                {
+                    <tr>
+                        <td><a asp-page="/Studies/Model/ModelView" asp-route-id=@q.FriendId class="btn btn-link" type="button">@q.FirstName @q.LastName</a></td>
+                        <td>@q.Email</td>
+                        <td>@(q.Birthday.HasValue ? q.Birthday.Value.ToString("d MMMM yyyy") : "No birthday found")</td>
+                        <td>
+                            <button class="btn btn-danger">Delete</button>
+                            <button class="btn btn-secondary">Edit</button>
+                        </td>
+                    </tr>
+                }
+            }
+        }
+
+    </tbody>
+</table>
