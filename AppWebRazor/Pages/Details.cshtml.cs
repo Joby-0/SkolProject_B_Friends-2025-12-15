@@ -15,7 +15,10 @@ public class DetailsModel : PageModel
     readonly IFriendsService _friendsService;
 
     [BindProperty]
-    public csFriend friend { get; set; }
+    public FriendCuDto friendCu { get; set; }
+
+    public IFriend friend { get; set; }
+
 
     public DetailsModel(IFriendsService friendsService)
     {
@@ -30,27 +33,29 @@ public class DetailsModel : PageModel
         }
         try
         {
-            var updateitem = new FriendCuDto()
-            {
-                FriendId = friend.FriendId,
-                FirstName = friend.FirstName,
-                LastName = friend.LastName,
-                Email = friend.Email,
-                Birthday = friend.Birthday
-            };
-
-            await _friendsService.UpdateFriendAsync(updateitem);
-
-            return RedirectToPage("/Details", new { id = friend.FriendId, canedit = false });
-
+            await _friendsService.UpdateFriendAsync(friendCu);
         }
         catch (Exception ex)
         {
 
         }
-        return Page();
+        return RedirectToPage("/Details", new
+        {
+            id = friendCu.FriendId,
+            canedit = false
+        });
     }
+    public async Task<IActionResult> OnPostDeletePet(Guid petId)
+    {
+        friendCu.PetsId.Remove(petId);
 
+        await _friendsService.UpdateFriendAsync(friendCu);
+        return RedirectToPage("/Details", new
+        {
+            id = friendCu.FriendId,
+            canedit = true
+        });
+    }
     public async Task<IActionResult> OnGet(string id, bool canedit)
     {
 
@@ -58,8 +63,8 @@ public class DetailsModel : PageModel
         {
             Guid fId = Guid.Parse(id);
             var x = await _friendsService.ReadFriendAsync(fId, false);
-            friend = (csFriend)x.Item;
-            friend.FriendId = x.Item.FriendId;
+            friend = x.Item;
+            friendCu = new FriendCuDto(friend);
 
             if (canedit)
             {
