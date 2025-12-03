@@ -56,6 +56,17 @@ public class DetailsModel : PageModel
             canedit = true
         });
     }
+    public async Task<IActionResult> OnPostDeleteQuote(Guid QuoteId)
+    {
+        friendCu.QuotesId.Remove(QuoteId);
+
+        await _friendsService.UpdateFriendAsync(friendCu);
+        return RedirectToPage("/Details", new
+        {
+            id = friendCu.FriendId,
+            canedit = true
+        });
+    }
     public async Task<IActionResult> OnGet(string id, bool canedit)
     {
 

@@ -140,24 +140,23 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @{
-                        if (Model.friend.Quotes != null)
-                        {
-                            @foreach (var q in Model.friend.Quotes)
-                            {
-                                <tr>
-                                    <td>@q.QuoteText</td>
-                                    <td>@q.Author</td>
-                                    @if (Model.canEdit)
-                                    {
-                                        <td>
+                @for (int i = 0; i < Model.friend.Quotes.Count; i++)
+                    {
+                        <tr>
+                            <td>@Model.friend.Quotes[i].Name</td>
+                            <td>@Model.friend.Quotes[i].Mood</td>
+                            <td>@Model.friend.Quotes[i].Kind</td>
 
-                                            <button class="btn btn-danger">Delete</button>
-                                        </td>
-                                    }
-                                </tr>
+                            @if (Model.canEdit)
+                            {
+                                <td>
+                                    <button type="submit" asp-page-handler="DeleteQuote" name="QuotesId"
+                                        value="@Model.friend.Quotes[i].QuotesId" class="btn btn-danger">
+                                        Delete
+                                    </button>
+                                </td>
                             }
-                        }
+                        </tr>
                     }
 
                 </tbody>
