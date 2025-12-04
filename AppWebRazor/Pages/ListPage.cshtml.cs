@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Models.DTO;
 using Models.Interfaces;
 using Services.Interfaces;
@@ -14,33 +15,32 @@ public class ListPageModel : PageModel
     public string SelectedCountry { get; set; }
 
     [BindProperty(SupportsGet = true)]
-
     public string SelectedCity { get; set; }
+
     [BindProperty(SupportsGet = true)]
     public int pageNr { get; set; } = 0;
 
     public ResponsePageDto<IFriend> FriendsList { get; set; } = new ResponsePageDto<IFriend>();
 
-    public List<IAddress> AddressesList { get; set; } = new List<IAddress>();
+    public SelectList CountryList { get; set; }
 
-    public List<string> CityList { get; set; } = new List<string>();
+    public SelectList CityList { get; set; }
 
-
-    readonly IAddressesService _addressesService;
     readonly IFriendsService _friendsService;
 
     readonly IAdminService _adminService;
 
-    public ListPageModel(IAddressesService addressesService, IFriendsService friendsService, IAdminService adminService)
+    public ListPageModel(IFriendsService friendsService, IAdminService adminService)
     {
-        _addressesService = addressesService;
         _friendsService = friendsService;
         _adminService = adminService;
     }
 
     public async Task<IActionResult> OnPost()
     {
-        await populatedCitiesListAsync();
+        await PopulateSelect();
+        await populatedFriendsListAsync();
+
         return RedirectToPage("/Listpage", new
         {
             pageNr = 0,
@@ -51,16 +51,45 @@ public class ListPageModel : PageModel
 
     public async Task<IActionResult> OnGet()
     {
-        await populatedAddressListAsync();
+        await PopulateSelect();
         await populatedFriendsListAsync();
-        await populatedCitiesListAsync();
         return Page();
     }
 
-    public async Task populatedAddressListAsync()
+    public async Task PopulateSelect()
     {
-        var x = await _addressesService.ReadAddressesAsync(true, false, null, 0, 10);
-        AddressesList = x.PageItems;
+        var dbInfo = await _adminService.GuestInfoAsync();
+
+        var countries = dbInfo.Item.Friends
+            .Where(f => f.Country != null)
+            .Select(f => f.Country)
+            .Distinct()
+            .ToList();
+
+        CountryList = new SelectList(countries, SelectedCountry);
+
+        if (!string.IsNullOrWhiteSpace(SelectedCountry))
+        {
+            var cities = dbInfo.Item.Friends
+                .Where(f => f.Country == SelectedCountry)
+                .Where(f => f.City != null)
+                .Select(f => f.City)
+                .Distinct()
+                .ToList();
+
+            // If current SelectedCity does not exist in the new cities list, reset it
+            if (!cities.Contains(SelectedCity))
+            {
+                SelectedCity = null;
+            }
+
+            CityList = new SelectList(cities, SelectedCity);
+        }
+        else
+        {
+            SelectedCity = null; // no country selected, reset city
+            CityList = new SelectList(Enumerable.Empty<string>());
+        }
     }
 
     public async Task populatedFriendsListAsync()
@@ -72,27 +101,6 @@ public class ListPageModel : PageModel
         else if (!string.IsNullOrWhiteSpace(SelectedCountry) && !string.IsNullOrWhiteSpace(SelectedCity))
         {
             FriendsList = await _friendsService.ReadFriendsAsync(true, true, SelectedCity.ToLower(), pageNr, 10);
-        }
-    }
-    public async Task populatedCitiesListAsync()
-    {
-        if (string.IsNullOrWhiteSpace(SelectedCountry))
-        {
-            CityList = new List<string>();
-            SelectedCity = "";
-            return;
-        }
-
-        var dbInfo = await _adminService.GuestInfoAsync();
-
-        CityList = dbInfo.Item.Friends
-            .Where(f => f.Country == SelectedCountry && !string.IsNullOrEmpty(f.City))
-            .Select(f => f.City)
-            .ToList();
-
-        if (!string.IsNullOrEmpty(SelectedCity) && !CityList.Contains(SelectedCity))
-        {
-            SelectedCity = "";
         }
     }
 }

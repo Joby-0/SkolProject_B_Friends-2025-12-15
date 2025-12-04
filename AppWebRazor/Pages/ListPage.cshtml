@@ -3,29 +3,23 @@
 @{
 }
 
-<form method="post" class="d-flex">
-    <select name="SelectedCountry" class="form-select" aria-label="SelectedCountry" onchange="this.form.submit()">
-        <option selected></option>
+<form method="post" class="d-flex col-6 justify-content-between mt-3">
+    <div class="col-4">
+        <label asp-for="SelectedCountry">Country</label>
 
-        @foreach (var c in Model.AddressesList.Select(a => a.Country).Distinct())
-        {
-            <option value="@c" selected="@(Model.SelectedCountry == c)">
-                @c
-            </option>
-        }
+        <select asp-for="SelectedCountry" asp-items="Model.CountryList" class="form-select"
+            onchange="this.form.submit()">
+            <option value="">Select country</option>
+        </select>
+    </div>
 
-    </select>
+    <div class="col-4">
+        <label asp-for="SelectedCity">City</label>
 
-    <select name="SelectedCity" class="form-select" onchange="this.form.submit()">
-        <option selected></option>
-        @foreach (var c in Model.CityList)
-        {
-            <option value="@c" selected="@(Model.SelectedCity == c)">
-                @c
-            </option>
-        }
-
-    </select>
+        <select asp-for="SelectedCity" asp-items="Model.CityList" class="form-select" onchange="this.form.submit()">
+            <option value="">Select city</option>
+        </select>
+    </div>
 </form>
 
 
@@ -63,6 +57,10 @@
 
     </tbody>
 
+</table>
+@if (Model.FriendsList.PageItems != null)
+{
+
     <nav aria-label="Page navigation">
         <ul class="pagination">
 
@@ -95,4 +93,4 @@
 
         </ul>
     </nav>
-</table>
+}

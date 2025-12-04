@@ -3,11 +3,11 @@
 @{
 }
 <div class="card p-4 mb-4">
-    <form method="post" class="needs-validation">
+    <form method="post" class="needs-validation" >
 
         <h1 class="mb-3">Deatil view
 
-            <a asp-page="/Details" asp-route-id="@Model.friend.FriendId" asp-route-canedit="true"
+            <a asp-page="/Details" asp-route-id="@Model.FriendForm.FriendId" asp-route-canedit="true"
                 class="btn btn-primary">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
                     class="bi bi-pencil-square" viewBox="0 0 16 16">
@@ -31,17 +31,14 @@
         </h1>
 
 
-        <input type="hidden" name="friendCu.FriendId" value="@Model.friendCu.FriendId" />
-        <input type="hidden" name="friendCu.AddressId" value="@Model.friendCu.AddressId" />
-        @for (int i = 0; i < Model.friendCu.PetsId.Count; i++)
-        {
-            <input type="hidden" name="friendCu.PetsId[@i]" value="@Model.friendCu.PetsId[i]" />
-        }
+        <input type="hidden" name="FriendForm.FriendId" value="@Model.FriendForm.FriendId" />
+        <input type="hidden" name="FriendForm.AddressId" value="@Model.FriendForm.Address.AddressId" />
 
-        @for (int i = 0; i < Model.friendCu.QuotesId.Count; i++)
-        {
-            <input type="hidden" name="friendCu.QuotesId[@i]" value="@Model.friendCu.QuotesId[i]" />
-        }
+        <input type="hidden" name="clickDelete" data-delete-item-id-target />
+
+
+
+
 
 
         <div class="card p-4 mb-4">
@@ -49,24 +46,24 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <label for="FirstName" class="form-label">First Name</label>
-                    <input type="text" class="form-control" id="FirstName" name="friendCu.FirstName"
-                        value="@Model.friendCu.FirstName" @(Model.canEdit ? "" : "disabled")>
+                    <input required type="text" class="form-control" id="FirstName" name="FriendForm.FirstName"
+                        value="@Model.FriendForm.FirstName" @(Model.canEdit ? "" : "disabled")>
                 </div>
                 <div class="col-md-6">
                     <label for="LastName" class="form-label">Last Name</label>
-                    <input type="text" class="form-control" id="LastName" name="friendCu.LastName"
-                        value="@Model.friendCu.LastName" @(Model.canEdit ? "" : "disabled")>
+                    <input required type="text" class="form-control" id="LastName" name="FriendForm.LastName"
+                        value="@Model.FriendForm.LastName" @(Model.canEdit ? "" : "disabled")>
                 </div>
                 <div class="col-md-6">
                     <label for="Birthday" class="form-label">Birthday</label>
-                    <input type="date" class="form-control" id="Birthday" name="friendCu.Birthday"
-                        value="@(Model.friendCu.Birthday.HasValue? Model.friend.Birthday.Value.ToString("yyyy-MM-dd") : "")"
+                    <input required type="date" class="form-control" id="Birthday" name="FriendForm.Birthday"
+                        value="@(Model.FriendForm.Birthday.HasValue? Model.FriendForm.Birthday.Value.ToString("yyyy-MM-dd") : "")"
                         @(Model.canEdit ? "" : "disabled")>
                 </div>
                 <div class=" col-md-6">
                     <label for="Email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="Email" name="friendCu.Email"
-                        value="@Model.friendCu.Email" @(Model.canEdit ? "" : "disabled")>
+                    <input required type="email" class="form-control" id="Email" name="FriendForm.Email"
+                        value="@Model.FriendForm.Email" @(Model.canEdit ? "" : "disabled")>
                 </div>
             </div>
         </div>
@@ -76,22 +73,21 @@
             <div class="row g-3">
                 <div class="col-md-4">
                     <label for="City" class="form-label">City</label>
-                    <input type="text" class="form-control" id="City" name="friend.Address.City"
-                        value="@Model.friend.Address.City" @(Model.canEdit ? "" : "disabled")>
+                    <input required type="text" class="form-control" id="City" name="FriendForm.Address.City"
+                        value="@Model.FriendForm.Address.City" @(Model.canEdit ? "" : "disabled")>
                 </div>
                 <div class="col-md-4">
                     <label for="Country" class="form-label">Country</label>
-                    <input type="text" class="form-control" id="Country" name="friend.Address.Country"
-                        value="@Model.friend.Address.Country" @(Model.canEdit ? "" : "disabled")>
+                    <input required type="text" class="form-control" id="Country" name="FriendForm.Address.Country"
+                        value="@Model.FriendForm.Address.Country" @(Model.canEdit ? "" : "disabled")>
                 </div>
                 <div class="col-md-4">
                     <label for="ZipCode" class="form-label">Zip Code</label>
-                    <input type="text" class="form-control" id="ZipCode" name="friend.Address.ZipCode"
-                        value="@Model.friend.Address.ZipCode" @(Model.canEdit ? "" : "disabled")>
+                    <input required type="text" class="form-control" id="ZipCode" name="FriendForm.Address.ZipCode"
+                        value="@Model.FriendForm.Address.ZipCode" @(Model.canEdit ? "" : "disabled")>
                 </div>
             </div>
         </div>
-
 
         <div class="card p-4 mb-4">
             <h1>Pets</h1>
@@ -104,18 +100,28 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for (int i = 0; i < Model.friend.Pets.Count; i++)
+                    @for (int i = 0; i < Model.FriendForm.Pets.Count; i++)
                     {
-                        <tr>
-                            <td>@Model.friend.Pets[i].Name</td>
-                            <td>@Model.friend.Pets[i].Mood</td>
-                            <td>@Model.friend.Pets[i].Kind</td>
+
+                        <tr
+                            class="@(Model.FriendForm.Pets[i].Status == AppWebRazor.Pages.StatusIM.Deleted ? "d-none" : null)">
+                            <input type="hidden" name="FriendForm.Pets[@i].PetId" value="@Model.FriendForm.Pets[i].PetId" />
+                            <input type="hidden" name="FriendForm.Pets[@i].Name" value="@Model.FriendForm.Pets[i].Name" />
+                            <input type="hidden" name="FriendForm.Pets[@i].Mood" value="@Model.FriendForm.Pets[i].Mood" />
+                            <input type="hidden" name="FriendForm.Pets[@i].Kind" value="@Model.FriendForm.Pets[i].Kind" />
+                            <input type="hidden" name="FriendForm.Pets[@i].Status"
+                                value="@Model.FriendForm.Pets[@i].Status" />
+                            <td>@Model.FriendForm.Pets[i].Name</td>
+                            <td>@Model.FriendForm.Pets[i].Mood</td>
+                            <td>@Model.FriendForm.Pets[i].Kind</td>
 
                             @if (Model.canEdit)
                             {
                                 <td>
-                                    <button type="submit" asp-page-handler="DeletePet" name="petId"
-                                        value="@Model.friend.Pets[i].PetId" class="btn btn-danger">
+                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal" data-delete-item-type="pet"
+                                        data-delete-item-id="@Model.FriendForm.Pets[i].PetId"
+                                        data-delete-item-name="@Model.FriendForm.Pets[i].Name">
                                         Delete
                                     </button>
                                 </td>
@@ -140,17 +146,29 @@
                     </tr>
                 </thead>
                 <tbody>
-                @for (int i = 0; i < Model.friend.Quotes.Count; i++)
+                    @for (int i = 0; i < Model.FriendForm.Quotes.Count; i++)
                     {
-                        <tr>
-                            <td>@Model.friend.Quotes[i].QuoteText</td>
-                            <td>@Model.friend.Quotes[i].Author</td>
+                        <tr
+                            class="@(Model.FriendForm.Quotes[i].Status == AppWebRazor.Pages.StatusIM.Deleted ? "d-none" : null)">
+                            <input type="hidden" name="FriendForm.Quotes[@i].QuoteId"
+                                value="@Model.FriendForm.Quotes[i].QuoteId" />
+                            <input type="hidden" name="FriendForm.Quotes[@i].QuoteText"
+                                value="@Model.FriendForm.Quotes[i].QuoteText" />
+                            <input type="hidden" name="FriendForm.Quotes[@i].Author"
+                                value="@Model.FriendForm.Quotes[i].Author" />
+                            <input type="hidden" name="FriendForm.Quotes[@i].Status"
+                                value="@Model.FriendForm.Quotes[i].Status" />
+
+                            <td>@Model.FriendForm.Quotes[i].QuoteText</td>
+                            <td>@Model.FriendForm.Quotes[i].Author</td>
 
                             @if (Model.canEdit)
                             {
                                 <td>
-                                    <button type="submit" asp-page-handler="DeleteQuote" name="QuoteId"
-                                        value="@Model.friend.Quotes[i].QuoteId" class="btn btn-danger">
+                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal" data-delete-item-type="quote"
+                                        data-delete-item-id="@Model.FriendForm.Quotes[i].QuoteId"
+                                        data-delete-item-name="@Model.FriendForm.Quotes[i].QuoteText">
                                         Delete
                                     </button>
                                 </td>
@@ -158,9 +176,58 @@
                         </tr>
                     }
 
+
                 </tbody>
             </table>
         </div>
+
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-danger" id="deleteLabel">Confirm Deletion</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete <strong id="petName"></strong>?
+                    </div>
+                    <div class="modal-footer">
+                        <input type="hidden" name="itemId" id="itemId" value="" />
+                        <input type="hidden" name="itemType" id="itemType" value="" />
+
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" asp-page-handler="Delete" class="btn btn-danger">Delete</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
     </form>
 
 </div>
+
+
+@section Scripts {
+<script>
+  var deleteModal = document.getElementById('deleteModal');
+
+  deleteModal.addEventListener('show.bs.modal', function (event) {
+    var button = event.relatedTarget;
+    if (!button) return;
+
+    var id = button.getAttribute('data-delete-item-id');
+    var name = button.getAttribute('data-delete-item-name');
+    var type = button.getAttribute('data-delete-item-type');
+
+    // set modal text
+    var nameEl = deleteModal.querySelector('#deleteItemName');
+    var idEl = document.getElementById('itemId');
+    var typeEl = document.getElementById('itemType');
+
+    if (nameEl) nameEl.textContent = name || '';
+    if (idEl) idEl.value = id || '';
+    if (typeEl) typeEl.value = type || '';
+  });
+</script>
+}
