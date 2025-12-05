@@ -9,11 +9,19 @@
         {
             @if (string.IsNullOrWhiteSpace(country.City) && !string.IsNullOrWhiteSpace(country.Country))
             {
-
-                <div class="col-sm-6 col-md-4 col-lg-3">
+                var borderColor = country.Country switch
+                {
+                    "Sweden" => "border-warning",
+                    "Norway" => "border-danger",
+                    "Findland" => "border-primary-subtle",
+                    "Denmark" => "border-danger-subtle",
+                    _ => "border-primary" // Default color
+                };
+                <div class="col-sm-6 col-md-4 col-lg-3  mb-4">
                     <a asp-page="/Overview" asp-route-country=@country.Country
-                        class="btn card-link @(Model.SelectedCountry == country.Country ? "active-card" : "")" type="button">
-                        <div class="card p-4 mb-4 ">
+                        class="btn border-3 card-link  @(Model.SelectedCountry == country.Country ? $" border border-3 {borderColor}" : "") "
+                        type="button">
+                        <div class="card p-4">
                             <div class="d-flex">
                                 <h2>@country.Country</h2>
                             </div>

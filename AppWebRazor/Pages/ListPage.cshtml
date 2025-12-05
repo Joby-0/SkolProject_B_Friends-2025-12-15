@@ -3,7 +3,7 @@
 @{
 }
 
-<form method="post" class="d-flex col-6 justify-content-between mt-3">
+<form method="post" class="d-flex col-6 justify-content-between mt-3 mb-4">
     <div class="col-4">
         <label asp-for="SelectedCountry">Country</label>
 
@@ -45,7 +45,6 @@
                     <td>@q.Email</td>
                     <td>@(q.Birthday.HasValue? q.Birthday.Value.ToString("d MMMM yyyy") : "No birthday found")</td>
                     <td>
-                        <button class="btn btn-danger">Delete</button>
                         <a asp-page="/Details" asp-route-id=@q.FriendId asp-route-canedit="true" class="btn btn-secondary"
                             type="button">Edit</a>
                     </td>

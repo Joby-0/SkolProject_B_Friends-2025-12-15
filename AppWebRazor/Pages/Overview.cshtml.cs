@@ -26,6 +26,8 @@ public class OverviewModel : PageModel
     {
         dbInfo = await _adminService.GuestInfoAsync();
 
+        SelectedCountry = country;
+
         if (!string.IsNullOrWhiteSpace(country))
         {
             var friendInfo = dbInfo.Item.Friends.Where(f => f.Country == country && !string.IsNullOrEmpty(f.City)).ToList();

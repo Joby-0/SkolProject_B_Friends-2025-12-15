@@ -22,7 +22,7 @@ public class DetailsModel : PageModel
     [BindProperty]
     public FriendFormModel FriendForm { get; set; } = new();
 
-    public string ErrorMessage { get; set; } = null;
+    public string? ErrorMessage { get; set; } = null;
 
     //For Server Side Validation set by IsValid()
     public bool HasValidationErrors { get; set; }

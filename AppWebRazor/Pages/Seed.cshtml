@@ -3,12 +3,19 @@
 @{
 }
 
-<div >
-    <form method="post">
+<div>
+    <form method="post" class="p-3 border rounded bg-light">
         <div class="mb-3">
-            <label for="nrOfItems" class="form-label">Nr of seed</label>
-            <input type="number" class="form-control" id="nrOfItems" value="100" name="nrOfItems" aria-describedby="nrOfItems">
+            <label for="nrOfItems" class="form-label fw-semibold">Number of Seeds</label>
+            <input type="number" class="form-control" id="nrOfItems" name="nrOfItems" value="100" min="1" />
         </div>
-        <button type="submit"  class="btn btn-primary">Submit</button>
+
+        <button type="submit" class="btn btn-primary d-flex align-items-center">
+            <span>Submit</span>
+        </button>
     </form>
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger mt-2">@Model.ErrorMessage</div>
+    }
 </div>
