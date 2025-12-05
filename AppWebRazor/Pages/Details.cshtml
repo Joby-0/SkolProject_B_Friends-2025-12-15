@@ -3,7 +3,7 @@
 @{
 }
 <div class="card p-4 mb-4">
-    <form method="post" class="needs-validation" >
+    <form method="post" class="needs-validation" novalidate>
 
         <h1 class="mb-3">Deatil view
 
@@ -21,7 +21,7 @@
             {
 
                 <div class="text-end">
-                    <button type="submit" class="btn btn-success">Save</button>
+                    <button type="submit" asp-page-handler="Save" class="btn btn-success">Save</button>
                 </div>
 
 
@@ -32,12 +32,23 @@
 
 
         <input type="hidden" name="FriendForm.FriendId" value="@Model.FriendForm.FriendId" />
-        <input type="hidden" name="FriendForm.AddressId" value="@Model.FriendForm.Address.AddressId" />
+        <input type="hidden" name="FriendForm.Address.AddressId" value="@Model.FriendForm.Address.AddressId" />
 
         <input type="hidden" name="clickDelete" data-delete-item-id-target />
 
 
-
+        @if (Model.HasValidationErrors)
+        {
+            <div class="row g-3">
+                @foreach (var item in Model.ValidationErrorMsgs)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        @item
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+            </div>
+        }
 
 
 
@@ -46,24 +57,28 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <label for="FirstName" class="form-label">First Name</label>
-                    <input required type="text" class="form-control" id="FirstName" name="FriendForm.FirstName"
-                        value="@Model.FriendForm.FirstName" @(Model.canEdit ? "" : "disabled")>
+                    <input asp-for="FriendForm.FirstName" class="form-control"
+                        readonly="@(Model.canEdit ? null : "readonly")" />
+                    <span asp-validation-for="FriendForm.FirstName" class="invalid-feedback"></span>
                 </div>
                 <div class="col-md-6">
                     <label for="LastName" class="form-label">Last Name</label>
-                    <input required type="text" class="form-control" id="LastName" name="FriendForm.LastName"
-                        value="@Model.FriendForm.LastName" @(Model.canEdit ? "" : "disabled")>
+                    <input asp-for="FriendForm.LastName" required type="text" class="form-control"
+                        value="@Model.FriendForm.LastName" readonly="@(Model.canEdit ? null : "readonly")">
+                    <span asp-validation-for="FriendForm.LastName" class="invalid-feedback"></span>
                 </div>
                 <div class="col-md-6">
                     <label for="Birthday" class="form-label">Birthday</label>
-                    <input required type="date" class="form-control" id="Birthday" name="FriendForm.Birthday"
+                    <input asp-for="FriendForm.Birthday" required type="date" class="form-control"
                         value="@(Model.FriendForm.Birthday.HasValue? Model.FriendForm.Birthday.Value.ToString("yyyy-MM-dd") : "")"
-                        @(Model.canEdit ? "" : "disabled")>
+                        readonly="@(Model.canEdit ? null : "readonly")">
+                    <span asp-validation-for="FriendForm.Birthday" class="invalid-feedback"></span>
                 </div>
                 <div class=" col-md-6">
                     <label for="Email" class="form-label">Email</label>
-                    <input required type="email" class="form-control" id="Email" name="FriendForm.Email"
-                        value="@Model.FriendForm.Email" @(Model.canEdit ? "" : "disabled")>
+                    <input asp-for="FriendForm.Email" required type="email" class="form-control"
+                        value="@Model.FriendForm.Email" readonly="@(Model.canEdit ? null : "readonly")">
+                    <span asp-validation-for="FriendForm.Email" class="invalid-feedback"></span>
                 </div>
             </div>
         </div>
@@ -73,18 +88,27 @@
             <div class="row g-3">
                 <div class="col-md-4">
                     <label for="City" class="form-label">City</label>
-                    <input required type="text" class="form-control" id="City" name="FriendForm.Address.City"
-                        value="@Model.FriendForm.Address.City" @(Model.canEdit ? "" : "disabled")>
+                    <input asp-for="FriendForm.Address.City" required type="text" class="form-control"
+                        value="@Model.FriendForm.Address.City" readonly="@(Model.canEdit ? null : "readonly")">
+                    <span asp-validation-for="FriendForm.Address.City" class="invalid-feedback"></span>
                 </div>
                 <div class="col-md-4">
                     <label for="Country" class="form-label">Country</label>
-                    <input required type="text" class="form-control" id="Country" name="FriendForm.Address.Country"
-                        value="@Model.FriendForm.Address.Country" @(Model.canEdit ? "" : "disabled")>
+                    <input asp-for="FriendForm.Address.Country" required type="text" class="form-control"
+                        value="@Model.FriendForm.Address.Country" readonly="@(Model.canEdit ? null : "readonly")">
+                    <span asp-validation-for="FriendForm.Address.Country" class="invalid-feedback"></span>
                 </div>
                 <div class="col-md-4">
+                    <label for="StreetAddress" class="form-label">Street</label>
+                    <input asp-for="FriendForm.Address.StreetAddress" required type="text" class="form-control"
+                        value="@Model.FriendForm.Address.StreetAddress" readonly="@(Model.canEdit ? null : "readonly")">
+                    <span asp-validation-for="FriendForm.Address.StreetAddress" class="invalid-feedback"></span>
+                </div>
+                <div class="col-md-2">
                     <label for="ZipCode" class="form-label">Zip Code</label>
-                    <input required type="text" class="form-control" id="ZipCode" name="FriendForm.Address.ZipCode"
-                        value="@Model.FriendForm.Address.ZipCode" @(Model.canEdit ? "" : "disabled")>
+                    <input asp-for="FriendForm.Address.ZipCode" required type="text" class="form-control"
+                        value="@Model.FriendForm.Address.ZipCode" readonly="@(Model.canEdit ? null : "readonly")">
+                    <span asp-validation-for="FriendForm.Address.ZipCode" class="invalid-feedback"></span>
                 </div>
             </div>
         </div>
@@ -196,7 +220,7 @@
                         <input type="hidden" name="itemType" id="itemType" value="" />
 
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" asp-page-handler="Delete" class="btn btn-danger">Delete</button>
+                        <button formnovalidate type="submit" asp-page-handler="Delete" class="btn btn-danger">Delete</button>
                     </div>
 
                 </div>
@@ -209,25 +233,28 @@
 
 
 @section Scripts {
-<script>
-  var deleteModal = document.getElementById('deleteModal');
+    <!-- -->
+    <partial name="_ValidationScriptsPartial" />
 
-  deleteModal.addEventListener('show.bs.modal', function (event) {
-    var button = event.relatedTarget;
-    if (!button) return;
+    <script>
+        var deleteModal = document.getElementById('deleteModal');
 
-    var id = button.getAttribute('data-delete-item-id');
-    var name = button.getAttribute('data-delete-item-name');
-    var type = button.getAttribute('data-delete-item-type');
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            if (!button) return;
 
-    // set modal text
-    var nameEl = deleteModal.querySelector('#deleteItemName');
-    var idEl = document.getElementById('itemId');
-    var typeEl = document.getElementById('itemType');
+            var id = button.getAttribute('data-delete-item-id');
+            var name = button.getAttribute('data-delete-item-name');
+            var type = button.getAttribute('data-delete-item-type');
 
-    if (nameEl) nameEl.textContent = name || '';
-    if (idEl) idEl.value = id || '';
-    if (typeEl) typeEl.value = type || '';
-  });
-</script>
+            // set modal text
+            var nameEl = deleteModal.querySelector('#deleteItemName');
+            var idEl = document.getElementById('itemId');
+            var typeEl = document.getElementById('itemType');
+
+            if (nameEl) nameEl.textContent = name || '';
+            if (idEl) idEl.value = id || '';
+            if (typeEl) typeEl.value = type || '';
+        });
+    </script>
 }

@@ -1,5 +1,7 @@
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Models;
 using Models.DTO;
@@ -13,30 +15,81 @@ public class DetailsModel : PageModel
     [BindProperty]
     public bool canEdit { get; set; } = false;
     readonly IFriendsService _friendsService;
+    readonly IAddressesService _addressesService;
+
 
 
     [BindProperty]
     public FriendFormModel FriendForm { get; set; } = new();
 
+    public string ErrorMessage { get; set; } = null;
 
-    public DetailsModel(IFriendsService friendsService)
+    //For Server Side Validation set by IsValid()
+    public bool HasValidationErrors { get; set; }
+    public IEnumerable<string> ValidationErrorMsgs { get; set; }
+    public IEnumerable<KeyValuePair<string, ModelStateEntry>> InvalidKeys { get; set; }
+
+    public DetailsModel(IFriendsService friendsService, IAddressesService addressesService)
     {
         _friendsService = friendsService;
+        _addressesService = addressesService;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostSave()
     {
-        if (!ModelState.IsValid)
+        if (!IsValid())
         {
             return Page();
         }
         try
         {
-            // await _friendsService.UpdateFriendAsync(friendCu);
+            var dbInfo = await _friendsService.ReadFriendAsync(FriendForm.FriendId, false);
+            var original = dbInfo.Item.Address;
+
+            if (original.City != FriendForm.Address.City ||
+                original.Country != FriendForm.Address.Country ||
+                original.StreetAddress != FriendForm.Address.StreetAddress ||
+                original.ZipCode != FriendForm.Address.ZipCode)
+            {
+                FriendForm.Address.Status = StatusIM.Modified;
+            }
+
+            if (FriendForm.Address.Status == StatusIM.Modified)
+            {
+                AddressCuDto newAddress = new AddressCuDto()
+                {
+                    City = FriendForm.Address.City,
+                    ZipCode = FriendForm.Address.ZipCode,
+                    Country = FriendForm.Address.Country,
+                    StreetAddress = FriendForm.Address.StreetAddress
+                };
+                var addedAddress = await _addressesService.CreateAddressAsync(newAddress);
+                FriendForm.Address.AddressId = addedAddress.Item.AddressId;
+            }
+
+            FriendForm.Pets.RemoveAll(p => p.Status == StatusIM.Deleted);
+            FriendForm.Quotes.RemoveAll(p => p.Status == StatusIM.Deleted);
+
+            FriendCuDto UppdatedFriend = new FriendCuDto()
+            {
+                FriendId = FriendForm.FriendId,
+                FirstName = FriendForm.FirstName,
+                LastName = FriendForm.LastName,
+                Email = FriendForm.Email,
+                Birthday = FriendForm.Birthday,
+
+                AddressId = FriendForm.Address.AddressId,
+
+                PetsId = FriendForm.Pets.Select(p => p.PetId).ToList(),
+                QuotesId = FriendForm.Quotes.Select(q => q.QuoteId).ToList()
+            };
+            await _friendsService.UpdateFriendAsync(UppdatedFriend);
+            canEdit = false;
+
         }
         catch (Exception ex)
         {
-
+            ErrorMessage = ex.Message;
         }
         return Page();
     }
@@ -74,11 +127,29 @@ public class DetailsModel : PageModel
         }
         catch (Exception e)
         {
-
+            ErrorMessage = e.Message;
         }
         return Page();
 
     }
+
+    #region Server Side Validation
+    private bool IsValid(string[] validateOnlyKeys = null)
+    {
+        InvalidKeys = ModelState
+           .Where(s => s.Value.ValidationState == ModelValidationState.Invalid);
+
+        if (validateOnlyKeys != null)
+        {
+            InvalidKeys = InvalidKeys.Where(s => validateOnlyKeys.Any(vk => vk == s.Key));
+        }
+
+        ValidationErrorMsgs = InvalidKeys.SelectMany(e => e.Value.Errors).Select(e => e.ErrorMessage);
+        HasValidationErrors = InvalidKeys.Any();
+
+        return !HasValidationErrors;
+    }
+    #endregion
 }
 
 public enum StatusIM { Unknown, Unchanged, Inserted, Modified, Deleted }
@@ -148,15 +219,23 @@ public class QuoteFormModel
 public class FriendFormModel
 {
     public StatusIM Status { get; set; } = StatusIM.Unchanged;
+
+
     public Guid FriendId { get; set; }
+
+    [Required(ErrorMessage = "You must provide a first Name")]
     public string FirstName { get; set; }
+    [Required(ErrorMessage = "You must provide a last name")]
     public string LastName { get; set; }
+    [Required(ErrorMessage = "You must provide a email")]
     public string Email { get; set; }
+    [Required(ErrorMessage = "You must provide a birthday")]
     public DateTime? Birthday { get; set; }
 
-    public AddressFormModel Address {get;set;}
+    public AddressFormModel Address { get; set; }
     public List<PetFormModel> Pets { get; set; } = new();
     public List<QuoteFormModel> Quotes { get; set; } = new();
+
 
     // Copy constructor
     public FriendFormModel(FriendFormModel original)
@@ -197,7 +276,7 @@ public class FriendFormModel
 
         Address.AddressId = Address.AddressId;
 
-        
+
         if (model.Pets == null)
             model.Pets = new List<IPet>();
         if (model.Quotes == null)
@@ -216,9 +295,13 @@ public class AddressFormModel
     public StatusIM Status { get; set; } = StatusIM.Unchanged;
 
     public Guid AddressId { get; set; }
+    [Required(ErrorMessage = "You must provide a street")]
     public string StreetAddress { get; set; }
+    [Required(ErrorMessage = "You must provide a zipcode")]
     public int ZipCode { get; set; }
+    [Required(ErrorMessage = "You must provide a city")]
     public string City { get; set; }
+    [Required(ErrorMessage = "You must provide a country")]
     public string Country { get; set; }
 
     public List<Guid> FriendsId { get; set; } = new();
@@ -262,4 +345,8 @@ public class AddressFormModel
         // You will probably handle Friends → Address mapping somewhere else
         return model;
     }
+
+
+
 }
+
