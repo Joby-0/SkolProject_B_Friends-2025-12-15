@@ -1,0 +1,19 @@
+﻿@{
+}
+@model SeedViewModel
+<div>
+    <form asp-action="Seed" method="post" class="p-3 border rounded bg-light">
+        <div class="mb-3">
+            <label for="nrOfItems" class="form-label fw-semibold">Number of Seeds</label>
+            <input type="number" class="form-control" id="nrOfItems" name="nrOfItems" value="100" min="1" />
+        </div>
+
+        <button type="submit" class="btn btn-primary d-flex align-items-center">
+            <span>Submit</span>
+        </button>
+    </form>
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger mt-2">@Model.ErrorMessage</div>
+    }
+</div>

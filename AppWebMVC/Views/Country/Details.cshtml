@@ -1,0 +1,269 @@
+﻿@model DetailsViewModel
+<div class="card p-4 mb-4">
+    <form method="post" class="needs-validation" novalidate>
+
+        <h1 class="mb-3">Deatil view
+
+            <a asp-controller="Country" asp-action="Details" asp-route-id="@Model.FriendForm.FriendId"
+                asp-route-canedit="true" class="btn btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                    class="bi bi-pencil-square" viewBox="0 0 16 16">
+                    <path
+                        d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                    <path fill-rule="evenodd"
+                        d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
+                </svg>
+            </a>
+            @if (Model.canEdit)
+            {
+
+                <div class="text-end">
+                    <button type="submit" asp-controller="Country" asp-action="Save" class="btn btn-success">Save</button>
+                </div>
+            }
+        </h1>
+
+
+        <input type="hidden" name="FriendForm.FriendId" value="@Model.FriendForm.FriendId" />
+        <input type="hidden" name="FriendForm.Address.AddressId" value="@Model.FriendForm.Address.AddressId" />
+
+        <input type="hidden" name="clickDelete" data-delete-item-id-target />
+
+        @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+        {
+            <div class="row g-3">
+
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @Model.ErrorMessage
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+            </div>
+        }
+        @if (Model.HasValidationErrors)
+        {
+            <div class="row g-3">
+                @foreach (var item in Model.ValidationErrorMsgs)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        @item
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+            </div>
+        }
+
+
+
+        <div class="card p-4 mb-4">
+            <h3 class="mb-3">Personal Information</h3>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="FirstName" class="form-label">First Name</label>
+                    <input asp-for="FriendForm.FirstName" class="form-control"
+                        readonly="@(Model.canEdit ? null : "readonly")" />
+                    <span asp-validation-for="FriendForm.FirstName" class="invalid-feedback"></span>
+                </div>
+                <div class="col-md-6">
+                    <label for="LastName" class="form-label">Last Name</label>
+                    <input asp-for="FriendForm.LastName" required type="text" class="form-control"
+                        value="@Model.FriendForm.LastName" readonly="@(Model.canEdit ? null : "readonly")">
+                    <span asp-validation-for="FriendForm.LastName" class="invalid-feedback"></span>
+                </div>
+                <div class="col-md-6">
+                    <label for="Birthday" class="form-label">Birthday</label>
+                    <input asp-for="FriendForm.Birthday" required type="date" class="form-control"
+                        value="@(Model.FriendForm.Birthday.HasValue? Model.FriendForm.Birthday.Value.ToString("yyyy-MM-dd") : "")"
+                        readonly="@(Model.canEdit ? null : "readonly")">
+                    <span asp-validation-for="FriendForm.Birthday" class="invalid-feedback"></span>
+                </div>
+                <div class=" col-md-6">
+                    <label for="Email" class="form-label">Email</label>
+                    <input asp-for="FriendForm.Email" required type="email" class="form-control"
+                        value="@Model.FriendForm.Email" readonly="@(Model.canEdit ? null : "readonly")">
+                    <span asp-validation-for="FriendForm.Email" class="invalid-feedback"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4">
+            <h3 class="mb-3">Address <div id="addressSpinner"
+                    class="spinner-border spinner-border-sm ms-3 d-none text-primary" role="status"></div>
+            </h3>
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="City" class="form-label">City</label>
+                    <input asp-for="FriendForm.Address.City" required type="text" class="form-control"
+                        value="@Model.FriendForm.Address.City" readonly="@(Model.canEdit ? null : "readonly")">
+                    <span asp-validation-for="FriendForm.Address.City" class="invalid-feedback"></span>
+                </div>
+                <div class="col-md-4">
+                    <label for="Country" class="form-label">Country</label>
+                    <input asp-for="FriendForm.Address.Country" required type="text" class="form-control"
+                        value="@Model.FriendForm.Address.Country" readonly="@(Model.canEdit ? null : "readonly")">
+                    <span asp-validation-for="FriendForm.Address.Country" class="invalid-feedback"></span>
+                </div>
+                <div class="col-md-4">
+                    <label for="StreetAddress" class="form-label">Street</label>
+                    <input asp-for="FriendForm.Address.StreetAddress" required type="text" class="form-control"
+                        value="@Model.FriendForm.Address.StreetAddress" readonly="@(Model.canEdit ? null : "readonly")">
+                    <span asp-validation-for="FriendForm.Address.StreetAddress" class="invalid-feedback"></span>
+                </div>
+                <div class="col-md-2">
+                    <label for="ZipCode" class="form-label">Zip Code</label>
+                    <input asp-for="FriendForm.Address.ZipCode" required type="text" class="form-control"
+                        value="@Model.FriendForm.Address.ZipCode" readonly="@(Model.canEdit ? null : "readonly")">
+                    <span asp-validation-for="FriendForm.Address.ZipCode" class="invalid-feedback"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4">
+            <h1>Pets</h1>
+            <table class="table table-striped table-bordered ">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Mood</th>
+                        <th>Kind</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.FriendForm.Pets.Count; i++)
+                    {
+
+                        <tr
+                            class="@(Model.FriendForm.Pets[i].Status == AppWebMVC.Models.StatusIM.Deleted ? "d-none" : null)">
+                            <input type="hidden" name="FriendForm.Pets[@i].PetId" value="@Model.FriendForm.Pets[i].PetId" />
+                            <input type="hidden" name="FriendForm.Pets[@i].Name" value="@Model.FriendForm.Pets[i].Name" />
+                            <input type="hidden" name="FriendForm.Pets[@i].Mood" value="@Model.FriendForm.Pets[i].Mood" />
+                            <input type="hidden" name="FriendForm.Pets[@i].Kind" value="@Model.FriendForm.Pets[i].Kind" />
+                            <input type="hidden" name="FriendForm.Pets[@i].Status"
+                                value="@Model.FriendForm.Pets[@i].Status" />
+                            <td>@Model.FriendForm.Pets[i].Name</td>
+                            <td>@Model.FriendForm.Pets[i].Mood</td>
+                            <td>@Model.FriendForm.Pets[i].Kind</td>
+
+                            @if (Model.canEdit)
+                            {
+                                <td>
+                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal" data-delete-item-type="pet"
+                                        data-delete-item-id="@Model.FriendForm.Pets[i].PetId"
+                                        data-delete-item-name="@Model.FriendForm.Pets[i].Name">
+                                        Delete
+                                    </button>
+                                </td>
+                            }
+                        </tr>
+                    }
+
+
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="card p-4 mb-4">
+            <h1>Quotes</h1>
+            <table class="table table-striped table-bordered ">
+                <thead>
+                    <tr>
+                        <th>Quote</th>
+                        <th>Author</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.FriendForm.Quotes.Count; i++)
+                    {
+                        <tr
+                            class="@(Model.FriendForm.Quotes[i].Status == AppWebMVC.Models.StatusIM.Deleted ? "d-none" : null)">
+                            <input type="hidden" name="FriendForm.Quotes[@i].QuoteId"
+                                value="@Model.FriendForm.Quotes[i].QuoteId" />
+                            <input type="hidden" name="FriendForm.Quotes[@i].QuoteText"
+                                value="@Model.FriendForm.Quotes[i].QuoteText" />
+                            <input type="hidden" name="FriendForm.Quotes[@i].Author"
+                                value="@Model.FriendForm.Quotes[i].Author" />
+                            <input type="hidden" name="FriendForm.Quotes[@i].Status"
+                                value="@Model.FriendForm.Quotes[i].Status" />
+
+                            <td>@Model.FriendForm.Quotes[i].QuoteText</td>
+                            <td>@Model.FriendForm.Quotes[i].Author</td>
+
+                            @if (Model.canEdit)
+                            {
+                                <td>
+                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal" data-delete-item-type="quote"
+                                        data-delete-item-id="@Model.FriendForm.Quotes[i].QuoteId"
+                                        data-delete-item-name="@Model.FriendForm.Quotes[i].QuoteText">
+                                        Delete
+                                    </button>
+                                </td>
+                            }
+                        </tr>
+                    }
+
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-danger" id="deleteLabel">Confirm Deletion</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete <strong id="petName"></strong>?
+                    </div>
+                    <div class="modal-footer">
+                        <input type="hidden" name="itemId" id="itemId" value="" />
+                        <input type="hidden" name="itemType" id="itemType" value="" />
+
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button formnovalidate type="submit" asp-controller="Country" asp-action="Delete"
+                            class="btn btn-danger">Delete</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+</div>
+
+
+
+@section Scripts {
+    <!-- -->
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        var deleteModal = document.getElementById('deleteModal');
+
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            if (!button) return;
+
+            var id = button.getAttribute('data-delete-item-id');
+            var name = button.getAttribute('data-delete-item-name');
+            var type = button.getAttribute('data-delete-item-type');
+
+            // set modal text
+            var nameEl = deleteModal.querySelector('#deleteItemName');
+            var idEl = document.getElementById('itemId');
+            var typeEl = document.getElementById('itemType');
+
+            if (nameEl) nameEl.textContent = name || '';
+            if (idEl) idEl.value = id || '';
+            if (typeEl) typeEl.value = type || '';
+        });
+    </script>
+}

@@ -1,0 +1,98 @@
+﻿@model ListViewModel
+
+<form asp-controller="Country" asp-action="List" method="post" class="d-flex col-6 justify-content-between mt-3 mb-4">
+    <div class="col-4">
+        <label asp-for="SelectedCountry">Country</label>
+
+        <select asp-for="SelectedCountry" asp-items="Model.CountryList" class="form-select"
+            onchange="this.form.submit()">
+            <option value="">Select country</option>
+        </select>
+    </div>
+
+    <div class="col-4">
+        <label asp-for="SelectedCity">City</label>
+
+        <select asp-for="SelectedCity" asp-items="Model.CityList"  class="form-select" onchange="this.form.submit()">
+            <option value="">Select city</option>
+        </select>
+    </div>
+</form>
+
+
+
+<table class="table table-striped table-bordered ">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Birthday</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @if (Model.FriendsList.PageItems != null)
+        {
+            @foreach (var q in Model.FriendsList.PageItems)
+            {
+                <tr>
+                    <td><a asp-controller="Country" asp-action="Details" asp-route-id=@q.FriendId class="btn btn-link" type="button">@q.FirstName
+                            @q.LastName</a></td>
+                    <td>@q.Email</td>
+                    <td>@(q.Birthday.HasValue? q.Birthday.Value.ToString("d MMMM yyyy") : "No birthday found")</td>
+                    <td>
+                        <a asp-controller="Country" asp-action="Details" asp-route-id=@q.FriendId asp-route-canedit="true" class="btn btn-secondary"
+                            type="button">Edit</a>
+                    </td>
+                </tr>
+            }
+
+        }
+
+
+    </tbody>
+
+</table>
+@if (Model.FriendsList?.PageItems != null)
+{
+    <nav>
+        <ul class="pagination">
+
+            <li class="page-item @(Model.FriendsList.PageNr <= 0 ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="List"
+                   asp-route-pageNr="@(Model.FriendsList.PageNr - 1)"
+                   asp-route-selectedCountry="@Model.SelectedCountry"
+                   asp-route-selectedCity="@Model.SelectedCity">
+                    Previous
+                </a>
+            </li>
+
+            @for (int i = 0; i < Model.FriendsList.PageCount; i++)
+            {
+                <li class="page-item @(i == Model.FriendsList.PageNr ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="List"
+                       asp-route-pageNr="@i"
+                       asp-route-selectedCountry="@Model.SelectedCountry"
+                       asp-route-selectedCity="@Model.SelectedCity">
+                        @(i + 1)
+                    </a>
+                </li>
+            }
+
+            <li class="page-item @(Model.FriendsList.PageNr >= Model.FriendsList.PageCount - 1 ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="List"
+                   asp-route-pageNr="@(Model.FriendsList.PageNr + 1)"
+                   asp-route-selectedCountry="@Model.SelectedCountry"
+                   asp-route-selectedCity="@Model.SelectedCity">
+                    Next
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+}
+
