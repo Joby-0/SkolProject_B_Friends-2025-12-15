@@ -33,24 +33,23 @@ public class CountryController : Controller
         if (!string.IsNullOrWhiteSpace(country))
         {
             var friendInfo = dbInfo.Item.Friends
-                .Where(f => f.Country == country && !string.IsNullOrEmpty(f.City))
-                .ToList();
+                .Where(f => f.Country == country && !string.IsNullOrEmpty(f.City));
 
             var petInfo = dbInfo.Item.Pets
-                .Where(p => p.Country == country && !string.IsNullOrEmpty(p.City))
-                .ToList();
+                .Where(p => p.Country == country && !string.IsNullOrEmpty(p.City));
 
-            foreach (var city in friendInfo)
-            {
-                viewModel.CityStats.Add(new CityOverview
-                {
-                    City = city.City,
-                    NrFriends = city.NrFriends,
-                    NrPets = petInfo.Where(p => p.City == city.City).Sum(p => p.NrPets)
-                });
-            }
+            var cityStats = from f in friendInfo
+                            join p in petInfo
+                                on f.City equals p.City into petGroup
+                            select new CityOverview
+                            {
+                                City = f.City,
+                                NrFriends = f.NrFriends,
+                                NrPets = petGroup.Sum(p => p.NrPets)
+                            };
+
+            viewModel.CityStats.AddRange(cityStats);
         }
-
         return View(viewModel);
     }
 
@@ -206,8 +205,17 @@ public class CountryController : Controller
                     Country = friend.Address.Country,
                     StreetAddress = friend.Address.StreetAddress
                 };
-                var addedAddress = await _addressesService.CreateAddressAsync(newAddress);
-                friend.Address.AddressId = addedAddress.Item.AddressId;
+                Guid? existId = await GetExistingAddressId(newAddress);
+
+                if (!existId.HasValue)
+                {
+                    var addedAddress = await _addressesService.CreateAddressAsync(newAddress);
+                    friend.Address.AddressId = addedAddress.Item.AddressId;
+                }
+                else
+                {
+                    friend.Address.AddressId = existId.Value;
+                }
             }
 
             friend.Pets.RemoveAll(p => p.Status == StatusIM.Deleted);
@@ -254,4 +262,52 @@ public class CountryController : Controller
         return View("Details", viewModel);
     }
 
+
+    private async Task<Guid?> GetExistingAddressId(AddressCuDto newAddress)
+    {
+        int page = 0;
+        int pageSize = 50;
+        bool hasMore = true;
+        bool hasMore2 = true;
+
+        while (hasMore)
+        {
+            var result = await _addressesService.ReadAddressesAsync(true, false, null, page, pageSize);
+
+            if (result?.PageItems == null || !result.PageItems.Any())
+                break;
+
+            var match = result.PageItems.FirstOrDefault(address =>
+                address.StreetAddress == newAddress.StreetAddress &&
+                address.City == newAddress.City &&
+                address.ZipCode == newAddress.ZipCode);
+
+            if (match != null)
+                return match.AddressId;
+
+            hasMore = result.PageItems.Count == pageSize;
+            page++;
+        }
+        page = 0;
+        while (hasMore2)
+        {
+            var result = await _addressesService.ReadAddressesAsync(false, false, null, page, pageSize);
+
+            if (result?.PageItems == null || !result.PageItems.Any())
+                break;
+
+            var match = result.PageItems.FirstOrDefault(address =>
+                address.StreetAddress == newAddress.StreetAddress &&
+                address.City == newAddress.City &&
+                address.ZipCode == newAddress.ZipCode);
+
+            if (match != null)
+                return match.AddressId;
+
+            hasMore = result.PageItems.Count == pageSize;
+            page++;
+        }
+
+        return null;
+    }
 }

@@ -1,6 +1,6 @@
 ﻿@model DetailsViewModel
 <div class="card p-4 mb-4">
-    <form method="post" class="needs-validation" novalidate>
+    <form method="post" asp-controller="Country" asp-action="Save" class="needs-validation" novalidate>
 
         <h1 class="mb-3">Deatil view
 
@@ -16,9 +16,8 @@
             </a>
             @if (Model.canEdit)
             {
-
                 <div class="text-end">
-                    <button type="submit" asp-controller="Country" asp-action="Save" class="btn btn-success">Save</button>
+                    <button type="submit" id="" class="btn btn-success">Save</button>
                 </div>
             }
         </h1>
@@ -87,9 +86,11 @@
         </div>
 
         <div class="card p-4 mb-4">
-            <h3 class="mb-3">Address <div id="addressSpinner"
-                    class="spinner-border spinner-border-sm ms-3 d-none text-primary" role="status"></div>
-            </h3>
+            <div class="d-flex">
+                <h3 class="mb-3 mx-3">Address </h3>
+                <div id="addressSpinner" class="spinner-border spinner-border-sm my-3 d-none text-primary"role="status"></div>
+            </div>
+
 
             <div class="row g-3">
                 <div class="col-md-4">
@@ -244,6 +245,20 @@
     <!-- -->
 
     <partial name="_ValidationScriptsPartial" />
+    @* <script>
+        document.getElementById("saveBtn").addEventListener("click", function () {
+
+            // Show the spinner
+            document.getElementById("addressSpinner").classList.remove("d-none");
+
+            // Optional: Disable button to prevent double-click
+            this.disabled = true;
+
+            // Submit the form manually (because default submit gets intercepted)
+            this.closest("form").submit();
+        });
+    </script> *@
+
 
     <script>
         var deleteModal = document.getElementById('deleteModal');
